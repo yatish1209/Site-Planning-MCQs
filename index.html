@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Site Planning — Instant MCQ</title>
+<style>
+:root{--bg:#f3f5f7;--card:#fff;--ink:#17202a;--muted:#66727e;--line:#dfe4e8;--blue:#263746;--green:#198754;--greenbg:#dff5e5;--red:#c0392b;--redbg:#ffe3e0}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;-webkit-text-size-adjust:100%;padding-bottom:75px}
+header{position:sticky;top:0;z-index:20;background:var(--blue);color:#fff;padding:12px 14px;padding-top:max(12px,env(safe-area-inset-top));box-shadow:0 2px 8px #0003}
+h1{font-size:19px;margin:0 0 4px}
+.sub{font-size:12px;opacity:.82}
+.progress{height:8px;background:#ffffff30;border-radius:5px;margin-top:10px;overflow:hidden}
+#bar{height:100%;width:0;background:#58d68d;transition:.2s}
+.stats{display:flex;justify-content:space-between;font-size:12px;margin-top:6px}
+main{max-width:850px;margin:auto;padding:10px}
+.section{font-weight:800;font-size:15px;margin:16px 2px 8px;padding:10px 12px;background:#e4e9ee;border-left:4px solid #536a7c;border-radius:6px}
+.card{background:var(--card);border-radius:10px;padding:14px;margin:10px 0;box-shadow:0 1px 5px #0001;scroll-margin-top:125px}
+.q{font-weight:750;line-height:1.45;margin-bottom:11px}
+.option{display:flex;align-items:flex-start;gap:9px;padding:11px 9px;margin:7px 0;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;line-height:1.38;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+.option input{width:20px;height:20px;flex:none;margin:0;accent-color:var(--blue)}
+.option.correct{background:var(--greenbg);border:2px solid var(--green);color:#145b32}
+.option.wrong{background:var(--redbg);border:2px solid var(--red);color:#8f2118}
+.option.disabled{cursor:default}
+.feedback{margin-top:10px;padding:11px;border-radius:8px;font-size:14px;font-weight:800}
+.feedback.good{background:var(--greenbg);color:#145b32}
+.feedback.bad{background:var(--redbg);color:#8f2118}
+.explain{margin-top:9px;padding:10px;background:#f1f4f6;border-radius:8px;font-size:13px;line-height:1.45;color:#47535d}
+.nextbtn{width:100%;margin-top:10px;padding:12px;border:0;border-radius:8px;background:var(--blue);color:white;font-weight:800;font-size:15px;-webkit-appearance:none}
+.result{display:none;background:#fff;border-radius:10px;padding:15px;margin:10px 0;box-shadow:0 2px 7px #0002}
+.score{font-size:30px;font-weight:850}
+#bottom{position:fixed;bottom:0;left:0;right:0;z-index:30;background:#fff;border-top:1px solid #d8dde1;padding:8px;display:flex;gap:7px;justify-content:center;padding-bottom:max(8px,env(safe-area-inset-bottom))}
+button.mainbtn{border:0;border-radius:8px;padding:11px 14px;font-weight:800;background:#238636;color:white;-webkit-appearance:none}
+button.secondary{border:0;border-radius:8px;padding:11px 14px;font-weight:800;background:#e8edf1;color:#17202a;-webkit-appearance:none}
+</style>
+</head>
+<body>
+<header>
+<h1>Site Planning — 100 MCQs</h1>
+<div class="sub">Instant feedback mode • Tap an option to reveal the answer</div>
+<div class="progress"><div id="bar"></div></div>
+<div class="stats"><span id="answered">0 / 100 answered</span><span id="scoreTop">Score: 0</span></div>
+</header>
+
+<main>
+<div id="result" class="result"></div>
+<div id="quiz"></div>
+</main>
+
+<div id="bottom">
+<button class="mainbtn" onclick="showResult()">Score</button>
+<button class="secondary" onclick="resetQuiz()">Reset</button>
+<button class="secondary" onclick="window.scrollTo(0,0)">Top</button>
+</div>
+
+<script>
+const sections = [["A. SITE ANALYSIS", [["In site planning, the primary purpose of analysing the solar path of a site is to:", ["Determine the exact structural grid of the building", "Optimise building orientation, daylighting and solar heat gain", "Establish the legal setback from the road", "Determine the soil-bearing capacity"], 1], ["A site in the Northern Hemisphere has its longer axis oriented approximately east-west. The major advantage of this configuration for a naturally ventilated residential building is:", ["Maximum exposure to low-angle east and west sun", "Greater possibility of controlling solar exposure on the longer façades", "Elimination of the need for shading devices", "Maximum wind pressure on the shorter façades"], 1], ["Which combination is most appropriate for determining the suitability of a site for a large public building? 1. Existing vehicular access 2. Pedestrian catchment 3. Soil bearing capacity 4. Solar orientation 5. Existing utility infrastructure 6. Land ownership alone", ["1, 2, 3 and 4 only", "1, 2, 3, 4 and 5 only", "2, 4 and 6 only", "All six"], 1], ["A site receives strong prevailing winds from the south-west during the summer. For a building intended to maximise natural cross-ventilation, the most appropriate first planning response is to:", ["Completely block the south-west edge", "Orient openings and internal spaces to exploit the prevailing airflow", "Orient all openings exclusively towards the east", "Place all service spaces on the north side"], 1], ["Which site characteristic has the greatest direct influence on the cost of earthwork?", ["Vegetation type", "Existing contour profile", "Solar orientation", "Wind direction"], 1], ["A contour map shows contour lines that are extremely close together in one portion of a site. This indicates:", ["Nearly level terrain", "A gentle slope", "A steep slope", "A depression"], 2], ["If contour lines cross a proposed road alignment almost perpendicularly, the road is generally:", ["Running approximately parallel to the contours", "Running approximately along the line of maximum slope", "Following a ridge", "Following a valley"], 1], ["A site contains a natural depression surrounded by higher ground. Unless deliberately modified, this area is most likely to function as:", ["A natural drainage collection zone", "A ridge", "A watershed divide", "A high-point access route"], 0], ["Which factor should generally be considered before fixing the final location of a building footprint on a sloping site?", ["Furniture arrangement", "Cut-and-fill requirements and natural drainage", "Interior colour scheme", "Ceiling height"], 1], ["A site analysis identifies an existing mature tree located near the proposed building footprint. The most sustainable planning approach is generally to:", ["Remove it automatically", "Retain it where feasible and integrate it into the site design", "Cover its root zone with concrete", "Relocate all utilities directly through its root zone"], 1], ["Which of the following represents the correct hierarchy in site analysis?", ["Building design → site analysis → zoning → infrastructure", "Site reconnaissance → analysis of physical/environmental factors → constraints/opportunities → planning response", "Zoning → construction → site analysis → landscape", "Structural design → site survey → zoning → access"], 1], ["A site receives intense afternoon solar radiation from the west. Which architectural response is generally most effective in reducing unwanted heat gain?", ["Large unshaded west-facing glazing", "External shading and reduction/control of west-facing openings", "Increasing west-facing skylights", "Using highly reflective internal flooring only"], 1], ["Which site-analysis parameter is least directly related to microclimate?", ["Wind movement", "Solar exposure", "Vegetation", "Property title"], 3], ["A proposed building is located at the bottom of a steep slope. Which risk should receive particular attention?", ["Excessive solar altitude", "Surface runoff and possible water accumulation", "Lack of gravitational drainage", "Excessive sky exposure"], 1], ["The watershed of a site is best understood as:", ["The area receiving water from an underground pipeline", "The land area contributing runoff to a particular drainage outlet", "The paved portion of a site", "The area occupied by a water-storage tank"], 1]]], ["B. ZONING, REGULATIONS & NBC", [["In development control, FAR/FSI primarily controls:", ["Maximum building height only", "Relationship between total permissible floor area and plot area", "Minimum road width only", "Percentage of landscaped area"], 1], ["A plot has an area of 2,000 m² and permissible FAR is 1.5. The maximum permissible floor area, subject to other regulations, is:", ["1,500 m²", "2,000 m²", "3,000 m²", "3,500 m²"], 2], ["A plot of 1,500 m² has a permissible ground coverage of 40%. The maximum ground-floor building footprint is:", ["400 m²", "500 m²", "600 m²", "750 m²"], 2], ["Which statement best distinguishes ground coverage from FAR/FSI?", ["Ground coverage controls total floor area; FAR controls footprint", "Ground coverage relates to building footprint relative to plot area; FAR relates to total floor area", "Both are identical measures", "FAR applies only to residential buildings"], 1], ["A building complies with permissible FAR but exceeds the permitted ground coverage. It is:", ["Automatically compliant", "Non-compliant with respect to ground coverage", "Compliant because FAR supersedes coverage", "Exempt if the building is low-rise"], 1], ["Which of the following is not normally the purpose of building setbacks?", ["Light and ventilation", "Fire access and safety", "Privacy and open space", "Increasing permissible FAR automatically"], 3], ["A building is proposed on a narrow urban plot. The designer wishes to maximise floor area while maintaining acceptable daylight and ventilation. Which approach is most appropriate?", ["Ignore setbacks", "Optimise the building envelope within applicable setbacks, coverage, height and FAR controls", "Maximise coverage regardless of regulations", "Increase height without checking height restrictions"], 1], ["The National Building Code of India primarily serves as:", ["A property taxation manual", "A comprehensive model code providing guidelines for regulating building construction and related aspects", "A land acquisition law", "A municipal election regulation"], 1], ["Which NBC aspect is most directly associated with means of egress?", ["Structural aesthetics", "Fire and life safety", "Landscape design", "Property valuation"], 1], ["In fire-safe building planning, the fundamental principle of a means of egress is to provide:", ["A decorative secondary route", "A safe and sufficiently accessible path to a place of safety", "A route exclusively for firefighting personnel", "A route that terminates inside a service room"], 1], ["Which of the following should be considered while determining the adequacy of exits in an assembly building? 1. Occupant load 2. Number and capacity of exits 3. Travel distance 4. Exit accessibility 5. Fire and smoke conditions", ["1 and 2 only", "1, 2 and 3 only", "1, 2, 3 and 4 only", "All five"], 3], ["A dead-end corridor is particularly undesirable because:", ["It increases daylight", "Occupants may have limited alternative escape direction during an emergency", "It always increases structural stability", "It prevents natural ventilation completely"], 1], ["Which statement about occupant load is most appropriate?", ["It is determined solely by the number of rooms", "It is related to the intended use and occupancy characteristics of the space", "It is always equal to the building's seating capacity", "It is independent of floor area"], 1], ["A building's fire-safety design must be treated as:", ["An isolated architectural issue", "An integrated system involving occupancy, construction, detection, suppression, compartmentation and egress", "Only a structural design issue", "Only a firefighting-equipment issue"], 1], ["Which planning principle is most consistent with fire-safe site planning?", ["Conceal the fire tender access behind landscape features", "Provide appropriate access for emergency vehicles and maintain unobstructed approach routes", "Maximise dead-end access roads", "Place all exits towards inaccessible service yards"], 1]]], ["C. SITE ACCESS & HORIZONTAL CIRCULATION", [["The most desirable relationship between a major public building and its pedestrian entrance is generally:", ["Entrance hidden behind service access", "Clear, legible and direct pedestrian approach", "Entrance accessible only through parking", "Entrance located at the lowest drainage point"], 1], ["A site has separate pedestrian and vehicular entrances. The primary reason for such separation is:", ["Increase building height", "Reduce conflict between different movement systems", "Increase FAR", "Eliminate landscaping"], 1], ["Which is the best planning principle for vehicular circulation in a hospital?", ["Mixing ambulance movement with pedestrian plazas", "Providing clear and efficient emergency access with minimal conflict", "Routing ambulances through visitor parking", "Making emergency access dependent on one narrow gate"], 1], ["A cul-de-sac is most appropriately used when:", ["Through traffic is essential", "A road needs to terminate without a through connection", "Pedestrian movement must be eliminated", "Fire access is unnecessary"], 1], ["A turning radius in a site circulation system is primarily determined by:", ["Landscape species", "Vehicle geometry and operational requirements", "Building façade colour", "Floor-to-floor height"], 1], ["For a large institutional campus, which circulation hierarchy is generally most effective?", ["One undifferentiated circulation system", "Hierarchy of primary vehicular routes, secondary access, pedestrian routes and service routes", "Pedestrian routes only", "Service traffic through the main pedestrian plaza"], 1], ["The most important consideration when locating a service entrance is:", ["Maximum visual prominence", "Convenient functional access with minimum conflict with public circulation", "Orientation towards the main ceremonial entrance", "Placement at the highest point regardless of function"], 1], ["A pedestrian route crossing a major vehicular driveway should ideally be:", ["Hidden from drivers", "Clearly visible, direct and designed to minimise conflict", "Routed through landscaping without signage", "Placed at an acute angle to the road"], 1], ["Which factor is most important in determining whether a site entrance is legible?", ["Complexity of paving pattern", "Visibility, hierarchy, orientation and clear relationship to the destination", "Number of decorative elements", "Maximum number of access points"], 1], ["A pedestrian circulation network is strongest when:", ["It consists entirely of dead ends", "Routes are direct, connected, safe and legible", "Pedestrians must repeatedly cross service traffic", "Every route is isolated from every other route"], 1], ["In a campus, a desire line represents:", ["The legal boundary of a property", "The naturally preferred path between origins and destinations", "A fire-fighting route", "A drainage line"], 1], ["If a large number of pedestrians repeatedly create an informal shortcut across a lawn, the most likely explanation is:", ["The soil has high bearing capacity", "The formal pedestrian route does not correspond to the actual movement desire line", "The site has inadequate FAR", "The building has excessive setbacks"], 1], ["For universal pedestrian circulation, a route should preferably be:", ["Indirect but aesthetically dramatic", "Continuous and accessible without unnecessary level changes", "Accessible only through stairs", "Narrow and visually concealed"], 1], ["Which is the least desirable location for a main pedestrian entrance?", ["Directly connected to a public forecourt", "Clearly visible from the approach", "At a location where pedestrian movement conflicts heavily with service vehicles", "Connected to an accessible route"], 2], ["A pedestrian plaza is most successful when it:", ["Functions as a vehicle storage area", "Provides a safe, legible transition between movement and building entry", "Eliminates all shade", "Forces pedestrians into vehicular circulation"], 1]]], ["D. VERTICAL CIRCULATION", [["The principal distinction between a stair and a ramp in circulation planning is:", ["Both are equivalent for all users", "A ramp generally permits more continuous level change and can provide easier access for wheeled mobility", "Stairs require no safety provisions", "Ramps are used only outdoors"], 1], ["The comfort of a stair is most directly influenced by the relationship between:", ["Tread and riser dimensions", "Window and sill height", "Wall thickness and ceiling height", "Column and beam dimensions"], 0], ["A stair with a very high riser and very narrow tread is generally:", ["More comfortable and safer", "More difficult and potentially hazardous to use", "Ideal for public buildings", "Equivalent to a ramp"], 1], ["A ramp has a rise of 1 m and a horizontal run of 12 m. Its approximate slope is:", ["1:6", "1:8", "1:10", "1:12"], 3], ["A ramp designed for universal accessibility should incorporate: 1. Appropriate slope 2. Handrails where required 3. Landings 4. Adequate clear width 5. Slip-resistant surface", ["1 and 2 only", "1, 2 and 3 only", "1, 2, 3 and 4 only", "All five"], 3], ["Why are intermediate landings required in long ramps?", ["Only for decoration", "To provide rest, manoeuvring and management of continuous level change", "To increase the slope", "To reduce clear width"], 1], ["In a public building, vertical circulation should generally be:", ["Located in inaccessible service areas only", "Clearly identifiable and appropriately distributed according to movement demand", "Restricted to one stair regardless of occupancy", "Designed independently of fire safety"], 1], ["An elevator is best understood in universal design as:", ["A replacement for all emergency exits", "An important accessible vertical circulation element, but not generally a substitute for required fire exits", "A decorative feature", "A service-only facility"], 1], ["Which vertical circulation arrangement provides the strongest redundancy?", ["One isolated staircase", "Multiple appropriately located stairs/egress routes", "One lift only", "One spiral stair"], 1], ["A building has a high concentration of users at the main entrance and upper floors. The most appropriate circulation planning approach is:", ["Provide circulation capacity based on expected demand and occupancy", "Minimise all vertical circulation", "Locate stairs only in basement", "Depend exclusively on escalators"], 0]]], ["E. UTILITIES & INFRASTRUCTURE", [["Which utility should ideally be planned with consideration for gravity flow wherever feasible?", ["Stormwater drainage", "Electrical supply", "Telecommunications", "Street lighting"], 0], ["The most fundamental difference between stormwater drainage and sewerage is:", ["Both carry identical flows", "Stormwater primarily conveys rainfall runoff, whereas sewerage conveys wastewater", "Sewerage carries only rainwater", "Stormwater is always pumped"], 1], ["A site utility plan should preferably:", ["Ignore future expansion", "Coordinate underground services spatially and account for access, maintenance and conflicts", "Place every utility in the same trench regardless of compatibility", "Route all services through building foundations"], 1], ["Why should utility corridors be planned before finalising landscape and hardscape?", ["Utilities have no spatial requirements", "Future access, maintenance and avoidance of conflicts must be considered", "Landscaping determines electrical voltage", "Hardscape eliminates utility requirements"], 1], ["Which is generally the most undesirable utility-planning strategy?", ["Providing accessible service corridors", "Coordinating utility crossings", "Placing critical services beneath areas where excavation would seriously disrupt major structures", "Providing inspection chambers where required"], 2], ["A septic tank is primarily associated with:", ["Treatment/disposal of wastewater where a suitable sewerage network is unavailable", "Storage of potable water", "Stormwater detention", "Electrical distribution"], 0], ["Which sequence best represents a conventional potable-water supply system?", ["Source → treatment/storage → distribution → point of use", "Point of use → treatment → source", "Sewer → reservoir → source", "Storm drain → treatment → electrical grid"], 0], ["The primary purpose of a water-storage tank in a building/site system is to:", ["Increase sewage generation", "Provide storage and help balance supply and demand", "Replace stormwater drainage", "Eliminate the need for distribution pipes"], 1], ["Rainwater harvesting is primarily intended to:", ["Increase surface runoff", "Capture and utilise/recharge rainfall that would otherwise become runoff", "Increase sewage generation", "Replace all municipal water treatment"], 1], ["A recharge pit is most closely associated with:", ["Groundwater recharge", "Electrical distribution", "Solid-waste compaction", "Fire escape"], 0], ["Which site-planning measure can reduce stormwater runoff at source?", ["Increasing impervious surface area", "Permeable paving and infiltration-oriented landscape design", "Removing vegetation", "Paving all open spaces"], 1], ["A decentralised wastewater treatment system is particularly useful when:", ["All sites necessarily have identical municipal infrastructure", "Local treatment/reuse is advantageous or central sewer connectivity is limited", "No wastewater is generated", "Stormwater is the only flow"], 1], ["Which utility requires particular attention to electromagnetic/electrical safety and service access?", ["Electrical distribution", "Landscape irrigation only", "Stormwater swale", "Pedestrian paving"], 0], ["In a large campus, locating the main electrical substation should consider:", ["Only architectural appearance", "Load distribution, access, safety, fire separation and maintenance", "Only prevailing wind direction", "Only landscape aesthetics"], 1], ["The most appropriate reason for providing utility easements/service corridors is:", ["To increase building density", "To protect access and prevent incompatible construction over critical services", "To eliminate maintenance", "To increase pedestrian traffic"], 1]]], ["F. SITE GRADING & DRAINAGE", [["The primary objective of site grading is to:", ["Maximise excavation", "Establish appropriate levels for buildings, access, drainage and landscape", "Eliminate all existing contours", "Increase building height"], 1], ["A spot elevation indicates:", ["The horizontal distance between contours", "The elevation of a specific point relative to a reference datum", "The soil type", "The property ownership"], 1], ["A contour line represents points having:", ["Equal horizontal distance", "Equal elevation", "Equal slope", "Equal rainfall"], 1], ["If contour interval is 1 m and a site rises from contour 102 m to contour 108 m, the vertical difference is:", ["4 m", "5 m", "6 m", "8 m"], 2], ["A ridge in contour interpretation generally represents:", ["A low drainage depression", "An elongated high ground from which water tends to drain away", "A flat plateau only", "An underground drain"], 1], ["A valley is typically indicated by contour lines forming:", ["V-shapes pointing uphill", "Perfect circles only", "Parallel straight lines", "No elevation change"], 0], ["When planning a road on sloping terrain, alignment roughly parallel to contours generally:", ["Produces greater slope than an alignment perpendicular to contours", "Can reduce longitudinal gradient", "Always requires maximum cut", "Eliminates drainage requirements"], 1], ["The gradient of a surface is fundamentally expressed as:", ["Horizontal distance divided by vertical rise", "Vertical change relative to horizontal distance", "Plot area divided by floor area", "Building height divided by FAR"], 1], ["A surface falling 1 m over a horizontal distance of 20 m has a gradient of approximately:", ["2%", "5%", "10%", "20%"], 1], ["If a site is graded entirely flat without providing drainage slopes, the most likely consequence is:", ["Faster drainage", "Ponding and water accumulation", "Improved infiltration automatically", "Increased natural slope"], 1], ["A swale is best described as:", ["A raised building platform", "A shallow landscape depression/channel designed to convey or manage runoff", "An underground electrical conduit", "A retaining wall"], 1], ["A catch basin in site drainage primarily functions to:", ["Collect surface runoff and direct it into the drainage system", "Store potable water permanently", "Increase road gradient", "Replace a sewer treatment plant"], 0], ["Which approach best follows sustainable site-drainage principles?", ["Collect all runoff immediately and discharge it downstream", "Follow a hierarchy of infiltration, detention/reuse and controlled discharge where feasible", "Eliminate all vegetation", "Maximise impervious surfaces"], 1], ["A retaining wall on a sloping site should be accompanied by:", ["No drainage provisions", "Appropriate drainage behind/around the wall to manage hydrostatic pressure", "Only decorative coping", "Increased soil saturation"], 1], ["Hydrostatic pressure behind a retaining wall can be reduced by:", ["Preventing all drainage", "Providing suitable drainage and relieving accumulated water", "Increasing soil saturation", "Eliminating weep/drainage provisions"], 1]]], ["G. BARRIER-FREE / UNIVERSAL DESIGN", [["The central principle of barrier-free design is:", ["Designing exclusively for wheelchair users", "Designing environments so they can be accessed and used by the widest practical range of users", "Eliminating all stairs from every building", "Providing separate entrances for persons with disabilities"], 1], ["A ramp may be technically present but still fail the principle of universal accessibility if:", ["It has adequate width", "It has excessive slope, lacks appropriate landings or creates unsafe movement conditions", "It has a handrail", "It connects two accessible levels"], 1], ["Which is the best example of universal design?", ["A separate hidden entrance for wheelchair users", "A common, dignified entrance usable by people with varied abilities", "A staircase with no alternative", "A service lift accessible only through a kitchen"], 1], ["Tactile indicators in public environments are primarily intended to:", ["Improve architectural ornamentation", "Assist persons with visual impairments in orientation and hazard awareness", "Increase floor loading", "Improve thermal insulation"], 1], ["A barrier-free route should ideally be:", ["Continuous from accessible parking/public approach to relevant building spaces", "Interrupted by unavoidable stairs", "Located only through service areas", "Dependent on assistance from staff"], 0], ["Which combination most directly improves accessibility?", ["Excessive thresholds + narrow doors + steep ramps", "Appropriate clearances + manageable level changes + tactile/visual information + accessible sanitary facilities", "Stairs + revolving doors only", "High kerbs + polished slippery surfaces"], 1], ["Why are abrupt level changes particularly problematic in barrier-free circulation?", ["They increase FAR", "They can impede wheelchair users, persons with walking difficulties and people with visual impairments", "They reduce sunlight", "They increase structural strength"], 1], ["An accessible parking space should ideally be:", ["Located at the farthest possible point from the entrance", "Connected by an accessible route to the building entrance", "Located behind service vehicles", "Provided without any accessible route"], 1], ["Which design principle is most important for an accessible toilet?", ["Minimum possible manoeuvring space", "Adequate clearances and manoeuvring space appropriate to the intended users and fixtures", "Door opening directly against every fixture", "Slippery floor finish"], 1], ["A revolving door as the only entrance to a public building is problematic because:", ["It consumes too little energy", "It may not provide an independently accessible entrance for all users", "It provides excessive daylight", "It increases drainage"], 1]]], ["H. SPATIAL STANDARDS & INTEGRATED APPLICATION", [["Which of the following is the most important distinction between a dimensional standard and a performance standard?", ["Dimensional standards are always optional", "Dimensional standards prescribe measurable physical dimensions, while performance standards focus on required functional outcomes", "Performance standards apply only to furniture", "Dimensional standards apply only to landscape"], 1], ["A designer provides the minimum dimensional clearance for a wheelchair but places a permanent obstruction immediately within the manoeuvring zone. The design:", ["Is automatically accessible because the minimum dimension exists", "Fails functionally because usable clearance and manoeuvring space have been compromised", "Is acceptable if the obstruction is decorative", "Becomes accessible by adding signage only"], 1], ["A 4-hectare institutional site has: Main road on the south; steep slope towards the north; natural drainage channel in the north-east; prevailing summer winds from south-west; major pedestrian demand from the south; mature trees near western edge. Which response is most appropriate?", ["Place the main building at the lowest north-east point and block the drainage channel", "Place major public access towards the south, respect natural drainage, integrate existing trees and use the slope/wind conditions in planning", "Remove all trees and fill the drainage channel", "Place parking and service access exclusively across the drainage channel"], 1], ["A site has a natural slope of 1:8. A designer proposes extensive excavation to make the entire site perfectly level. Which statement is most appropriate?", ["Complete levelling is always preferable", "The designer should first investigate whether the natural slope can be incorporated to reduce earthwork and preserve drainage", "Natural slopes should always be eliminated", "Drainage becomes irrelevant after levelling"], 1], ["Consider: 1. Separate pedestrian and service circulation where conflict is significant. 2. Preserve natural drainage wherever practicable. 3. Use site contours to reduce excessive cut-and-fill. 4. Coordinate utility corridors before hardscape construction. 5. Provide continuous accessible routes. 6. Locate emergency access so that it remains unobstructed. Which statement is most accurate?", ["Only 1, 2 and 3 represent site planning", "Only 4 and 5 represent site planning", "All six are fundamental components of integrated site planning", "Only 2 and 6 relate to regulations"], 2]]]];
+const flat = sections.flatMap(s=>s[1]);
+const key = flat.map(q=>q[2]);
+const quiz = document.getElementById("quiz");
+let qnum=0;
+
+sections.forEach(section=>{
+  const h=document.createElement("div");
+  h.className="section";
+  h.textContent=section[0];
+  quiz.appendChild(h);
+  section[1].forEach(q=>{
+    qnum++;
+    const card=document.createElement("div");
+    card.className="card";
+    card.id="card"+qnum;
+    let content='<div class="q">'+qnum+'. '+escapeHTML(q[0])+'</div>';
+    q[1].forEach((opt,i)=>{
+      content+='<label class="option" id="o'+qnum+'_'+i+'" onclick="answerQuestion('+qnum+','+i+',this)">';
+      content+='<input type="radio" name="q'+qnum+'" value="'+i+'">';
+      content+='<span>'+String.fromCharCode(65+i)+'. '+escapeHTML(opt)+'</span></label>';
+    });
+    card.innerHTML=content;
+    quiz.appendChild(card);
+  });
+});
+
+function escapeHTML(s){
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+function answerQuestion(n,choice,el){
+  const card=document.getElementById("card"+n);
+  if(card.dataset.answered==="1") return;
+  card.dataset.answered="1";
+
+  const correct=key[n-1];
+
+  card.querySelectorAll(".option").forEach(o=>{
+    o.classList.add("disabled");
+    const input=o.querySelector("input");
+    input.disabled=true;
+  });
+
+  card.querySelector('input[value="'+choice+'"]').checked=true;
+
+  if(choice===correct){
+    el.classList.add("correct");
+  }else{
+    el.classList.add("wrong");
+    document.getElementById("o"+n+"_"+correct).classList.add("correct");
+  }
+
+  const feedback=document.createElement("div");
+  feedback.className="feedback "+(choice===correct?"good":"bad");
+  feedback.textContent=choice===correct ? "✓ Correct!" :
+    "✗ Incorrect — correct answer: "+String.fromCharCode(65+correct);
+  card.appendChild(feedback);
+
+  const explanation=document.createElement("div");
+  explanation.className="explain";
+  explanation.innerHTML="<b>Concept:</b> "+getExplanation(n,correct);
+  card.appendChild(explanation);
+
+  if(n<100){
+    const next=document.createElement("button");
+    next.className="nextbtn";
+    next.textContent="Next Question →";
+    next.onclick=()=>document.getElementById("card"+(n+1)).scrollIntoView({behavior:"smooth",block:"start"});
+    card.appendChild(next);
+  }
+
+  updateProgress();
+}
+
+function getExplanation(n,c){
+  const explanations={
+    17:"FAR/FSI expresses the relationship between permissible total floor area and plot area.",
+    18:"Permissible floor area = plot area × FAR = 2,000 × 1.5 = 3,000 m².",
+    19:"Ground coverage controls the footprint; FAR controls aggregate permissible floor area.",
+    49:"Slope = rise/run = 1/12, so the approximate ratio is 1:12.",
+    79:"Gradient = vertical change/horizontal distance = 1/20 = 0.05 = 5%."
+  };
+  return explanations[n] || "The selected answer tests the core site-planning principle covered by this question.";
+}
+
+function updateProgress(){
+  let attempted=0,score=0;
+  for(let i=1;i<=100;i++){
+    const card=document.getElementById("card"+i);
+    if(card && card.dataset.answered==="1"){
+      attempted++;
+      if(card.querySelector(".feedback.good")) score++;
+    }
+  }
+  document.getElementById("answered").textContent=attempted+" / 100 answered";
+  document.getElementById("scoreTop").textContent="Score: "+score;
+  document.getElementById("bar").style.width=attempted+"%";
+}
+
+function showResult(){
+  let attempted=0,score=0;
+  for(let i=1;i<=100;i++){
+    const card=document.getElementById("card"+i);
+    if(card && card.dataset.answered==="1"){
+      attempted++;
+      if(card.querySelector(".feedback.good")) score++;
+    }
+  }
+  const r=document.getElementById("result");
+  r.style.display="block";
+  r.innerHTML='<div class="score">'+score+' / 100</div><b>'+(score)+'%</b><br><span style="color:#66727e;font-size:13px">Attempted: '+attempted+' &nbsp;|&nbsp; Remaining: '+(100-attempted)+'</span>';
+  r.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+function resetQuiz(){
+  if(!confirm("Reset all answers?")) return;
+  for(let i=1;i<=100;i++){
+    const card=document.getElementById("card"+i);
+    card.dataset.answered="0";
+    card.querySelectorAll(".option").forEach(o=>{
+      o.classList.remove("correct","wrong","disabled");
+      const input=o.querySelector("input");
+      input.disabled=false;
+      input.checked=false;
+    });
+    card.querySelectorAll(".feedback,.explain,.nextbtn").forEach(x=>x.remove());
+  }
+  document.getElementById("result").style.display="none";
+  updateProgress();
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
